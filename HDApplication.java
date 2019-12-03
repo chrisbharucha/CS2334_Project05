@@ -9,6 +9,8 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -18,10 +20,13 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class HDApplication extends Application implements EventHandler<ActionEvent>{
-
+	
+	Label hammDistLabel;
+	TextField hammDistText;
 	Button showStation;
 	Slider slider;
-	Label hammDistLabel;
+	ListView<String> list;
+	
 	
 	public static void main(String[] args) throws IOException {
 		launch(args);
@@ -42,19 +47,14 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		
 		
 		//hammDistLabel
-		Label hammDistLabel = new Label("Enter Hamming Dist:");
+		hammDistLabel = new Label("Enter Hamming Dist:");
 		GridPane.setConstraints(hammDistLabel, 0, 0);
 		
 		//hammDistText
-		TextField hammDistText = new TextField();
+		hammDistText = new TextField();
 		hammDistText.setEditable(false);
+		hammDistText.setPrefWidth(25);
 		GridPane.setConstraints(hammDistText, 1, 0);
-		
-		
-		//showStation button
-		showStation = new Button("Show Station");
-		GridPane.setConstraints(showStation, 0, 2);
-		showStation.setOnAction(this);
 		
 		//slider
 		initSlider();
@@ -66,9 +66,22 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 			}
 		});
 		
+		//showStation button
+		showStation = new Button("Show Station");
+		GridPane.setConstraints(showStation, 0, 2);
+		showStation.setOnAction(this);
 		
-		grid.getChildren().addAll(hammDistLabel, hammDistText, showStation, slider);
+		//list
+		list = new ListView<>();
+		GridPane.setConstraints(list, 0, 4);
+		list.setEditable(false);
+		list.getItems().addAll("yeet");
+		list.setPrefWidth(50);
+		list.setPrefHeight(128);
 		
+		//adding everything to the grid
+		grid.getChildren().addAll(hammDistLabel, hammDistText, slider, showStation
+				, list);
 		
 		//creating the scene
 		Scene scene = new Scene(grid, 550, 650);
@@ -83,7 +96,6 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		}
 	}
 	
-	
 	/*
 	 * initializes the slider
 	 */
@@ -94,9 +106,6 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		slider.setMajorTickUnit(1);
 		slider.setMinorTickCount(0);
 		slider.setSnapToTicks(true);
-		
-		
-		
 		GridPane.setConstraints(slider, 0, 1);
 	}
 	
