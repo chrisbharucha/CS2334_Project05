@@ -73,6 +73,21 @@ public class HammingDist {
 		return distances;
 	}
 	
+	/*
+	 * This method provides the functionality for part 3 of the application
+	 */
+	public void addStation(String station) {
+		stations.add(station.toUpperCase());
+	}
+	
+	/*
+	 * Method used by HDApplication to access the station's ArrayList
+	 */
+	public ArrayList<String> getStations() {
+		return stations;
+	}
+	
+	
 	
 	
 }
