@@ -34,11 +34,12 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		
 		//creating the layout for the stage and adding the components to it
 		GridPane gridpane = new GridPane();
-		gridpane.getChildren().add(showStation);
-		gridpane.getChildren().add(slider);
+		GridPane.setConstraints(showStation, 0, 5);
+		GridPane.setConstraints(slider, 0, 4);
+		gridpane.getChildren().addAll(showStation, slider);
 		
 		
-		Scene scene = new Scene(gridpane, 500, 600);
+		Scene scene = new Scene(gridpane, 550, 650);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
