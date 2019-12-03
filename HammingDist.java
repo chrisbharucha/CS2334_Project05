@@ -8,7 +8,6 @@ public class HammingDist {
 	private static final int NUM_DISTANCES = 5; //the number of distances needed is 0,1,2,3,4 --> so 5
 	
 	private	ArrayList<String> stations; //ArrayList that holds all the MesoStations from Mesonet.txt
-	private ArrayList<String> hammDistStations; //ArrayList that holds all the MesoStations that have a certain HD
 	private int[] distances; //Array that holds the number of MesoStations that share a distance of 0,1,2,3,4
 	
 	/*
@@ -18,7 +17,6 @@ public class HammingDist {
 	public HammingDist() throws IOException {
 		//initialize ArrayLists and Arrays
 		stations = new ArrayList<>();
-		hammDistStations = new ArrayList<>();
 		distances = new int[NUM_DISTANCES];
 		
 		//Create BufferedReader to read in the MesoStations
@@ -36,13 +34,13 @@ public class HammingDist {
 	 * This method provides the calculations for part 1 of the application
 	 */
 	public ArrayList<String> sameHammingDist(String station, int distance) {
+		ArrayList<String> hamDistStations = new ArrayList<String>();
 		for (int i = 0; i < stations.size(); ++i) {
 			String testStation = stations.get(i);
-			
 			if (calcHammingDist(station, testStation) == distance) {
-				hammDistStations.add(testStation);
+				hamDistStations.add(testStation);
 			}
-		} return hammDistStations;	
+		} return hamDistStations;	
 	}
 	
 	/*

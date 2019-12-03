@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -8,6 +9,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
@@ -21,11 +23,15 @@ import javafx.stage.Stage;
 
 public class HDApplication extends Application implements EventHandler<ActionEvent>{
 	
-	Label hammDistLabel;
-	TextField hammDistText;
-	Button showStation;
-	Slider slider;
-	ListView<String> list;
+	private HammingDist hammDist;
+	
+	private Label hammDistLabel;
+	private TextField hammDistText;
+	private Button showStation;
+	private Slider slider;
+	private ListView<String> list;
+	private Label compareWith;
+	private ChoiceBox<String> choiceBox;
 	
 	
 	public static void main(String[] args) throws IOException {
@@ -35,7 +41,7 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 	@Override
 	public void start(javafx.stage.Stage primaryStage) throws Exception {
 		//Creating a HammingDist object to use the classes' methods
-		HammingDist hammDist = new HammingDist();
+		hammDist = new HammingDist();
 		
 		primaryStage.setTitle("HammingDistance");
 		
@@ -51,7 +57,7 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		GridPane.setConstraints(hammDistLabel, 0, 0);
 		
 		//hammDistText
-		hammDistText = new TextField();
+		hammDistText = new TextField("1");
 		hammDistText.setEditable(false);
 		hammDistText.setPrefWidth(25);
 		GridPane.setConstraints(hammDistText, 1, 0);
@@ -75,13 +81,24 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		list = new ListView<>();
 		GridPane.setConstraints(list, 0, 4);
 		list.setEditable(false);
-		list.getItems().addAll("yeet");
 		list.setPrefWidth(50);
 		list.setPrefHeight(128);
 		
+		//compareWith label
+		compareWith = new Label("Compare with:");
+		GridPane.setConstraints(compareWith, 0, 5);
+		
+		//choiceBox 
+		choiceBox = new ChoiceBox<>();
+		GridPane.setConstraints(choiceBox, 1, 5);
+		ArrayList<String> stations = hammDist.getStations();
+		choiceBox.getItems().addAll(stations);
+		choiceBox.setValue("ACME");
+		
+		
 		//adding everything to the grid
 		grid.getChildren().addAll(hammDistLabel, hammDistText, slider, showStation
-				, list);
+				, list, compareWith, choiceBox);
 		
 		//creating the scene
 		Scene scene = new Scene(grid, 550, 650);
@@ -92,7 +109,10 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 	@Override
 	public void handle(ActionEvent event) {
 		if (event.getSource() == showStation) {
-			System.out.println("FIX");
+			int distance = Integer.parseInt(hammDistText.textProperty().getValue());
+			ArrayList<String>listStations = hammDist.sameHammingDist(choiceBox.getValue(), distance);
+			list.getItems().clear();
+			list.getItems().addAll(listStations);
 		}
 	}
 	
