@@ -5,17 +5,21 @@ import java.util.ArrayList;
 
 public class HammingDist {
 	
-	private	ArrayList<String> stations; //ArrayList that holds all the station ID's from Mesonet.txt
-	private ArrayList<String> hammDistStations;
+	private static final int NUM_DISTANCES = 5; //the number of distances needed is 0,1,2,3,4 --> so 5
+	
+	private	ArrayList<String> stations; //ArrayList that holds all the MesoStations from Mesonet.txt
+	private ArrayList<String> hammDistStations; //ArrayList that holds all the MesoStations that have a certain HD
+	private int[] distances; //Array that holds the number of MesoStations that share a distance of 0,1,2,3,4
 	
 	/*
 	 * This constructor initializes the ArrayLists and reads in and stores all of the MesoStations into
 	 * the ArrayList
 	 */
 	public HammingDist() throws IOException {
-		//initialize ArrayLists
+		//initialize ArrayLists and Arrays
 		stations = new ArrayList<>();
 		hammDistStations = new ArrayList<>();
+		distances = new int[NUM_DISTANCES];
 		
 		//Create BufferedReader to read in the MesoStations
 		BufferedReader br = new BufferedReader(new FileReader("Mesonet.txt"));
@@ -32,22 +36,19 @@ public class HammingDist {
 	 * This method provides the calculations for part 1 of the application
 	 */
 	public ArrayList<String> sameHammingDist(String station, int distance) {
-		
 		for (int i = 0; i < stations.size(); ++i) {
 			String testStation = stations.get(i);
 			
 			if (calcHammingDist(station, testStation) == distance) {
 				hammDistStations.add(testStation);
 			}
-		}
-		return hammDistStations;	
+		} return hammDistStations;	
 	}
 	
 	/*
-	 * This method calculates the HammingDistance between two MesoStations
+	 * This method calculates the HammingDistance between two given MesoStations
 	 */
 	public int calcHammingDist(String station1, String station2) {
-		
 		int distance = 0;
 		
 		for (int i = 0; i < 4; ++i) {
@@ -57,8 +58,19 @@ public class HammingDist {
 			if (testChar != station1Char) {
 				distance++;
 			}
-		}
-		return distance;
+		} return distance;
+	}
+	
+	/*
+	 * This method provides the calculations for part 2 of the application
+	 */
+	public int[] distanceCalc(String station) {
+		distances[0] = sameHammingDist(station, 0).size();
+		distances[1] = sameHammingDist(station, 1).size();
+		distances[2] = sameHammingDist(station, 2).size();
+		distances[3] = sameHammingDist(station, 3).size();
+		distances[4] = sameHammingDist(station, 4).size();
+		return distances;
 	}
 	
 	
