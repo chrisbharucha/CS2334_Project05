@@ -8,6 +8,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -56,7 +58,7 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		//Creating a HammingDist object to use the classes' methods
 		hammDist = new HammingDist();
 		
-		primaryStage.setTitle("HammingDistance");
+		primaryStage.setTitle("Hamming Distance");
 		
 		//creating the layout for the stage
 		GridPane grid = new GridPane();
@@ -180,13 +182,25 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 				, distance4Text, addStation, stationText);
 		
 		//creating the scene
-		Scene scene = new Scene(grid, 550, 650);
+		Scene scene = new Scene(grid, 550, 600);
 		primaryStage.setScene(scene);
 		primaryStage.show();
+		
+		//stops running the application after exiting the application itself
+		primaryStage.setOnCloseRequest(new EventHandler<javafx.stage.WindowEvent>() {
+			@Override
+			public void handle(javafx.stage.WindowEvent event) {
+				try {
+					stop();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	/*
-	 * These handle the cases of when the button is pressed
+	 * These handle the cases of when any button is pressed
 	 */
 	@Override
 	public void handle(ActionEvent event) {
@@ -206,7 +220,13 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		}
 		else if (event.getSource() == addStation) {
 			String station = stationText.textProperty().getValue().toUpperCase();
-			if (station.equals("")) {
+			
+			//if user doesn't enter a valid input, an error message displays
+			if (station.length() != 4) {
+				Alert error = new Alert(AlertType.ERROR);
+				error.setHeaderText("Input not valid");
+				error.setContentText("The size of a station must be 4 characters!");
+				error.showAndWait();
 			}
 			else {
 				choiceBox.getItems().add(station);
