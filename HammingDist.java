@@ -77,8 +77,4 @@ public class HammingDist {
 	public ArrayList<String> getStations() {
 		return stations;
 	}
-	
-	
-	
-	
 }

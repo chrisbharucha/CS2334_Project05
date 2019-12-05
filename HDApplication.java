@@ -1,12 +1,10 @@
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import javafx.animation.Animation;
-import javafx.animation.TranslateTransition;
+import javafx.animation.PathTransition;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -20,17 +18,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.scene.transform.Translate;
-import javafx.stage.Stage;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 import javafx.util.Duration;
 
 public class HDApplication extends Application implements EventHandler<ActionEvent>{
@@ -60,6 +56,9 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 	private TextField distance4Text;
 	private Button addStation;
 	private TextField stationText;
+	private Button parkingLotFast;
+	private Button parkingLotSlow; 
+	private PathTransition translate;
 	
 	
 	public static void main(String[] args) throws IOException {
@@ -204,7 +203,7 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		creativePortion();
 		
 		//creating the scene
-		Scene scene = new Scene(grid, 550, 600);
+		Scene scene = new Scene(grid, 550, 600, Color.RED);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 		
@@ -276,6 +275,16 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 				stationText.clear();
 			}
 		}
+		else if (event.getSource() == parkingLotFast) {
+			double rate = translate.getRate();
+			translate.setRate(rate*2);
+		}
+		else if (event.getSource() == parkingLotSlow) {
+			double rate = translate.getRate();
+			translate.setRate(rate/2);
+		}
+			
+			
 	}
 	
 	/*
@@ -298,63 +307,72 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 			ImageView rafal = new ImageView(image);
 			
 			//setting size of the picture
-			GridPane.setConstraints(rafal, 3, 0);
+			GridPane.setConstraints(rafal, 2, 0);
 			rafal.setFitHeight(100);
 			rafal.setFitWidth(100);
 			rafal.setPreserveRatio(true);
 			
-			grid.getChildren().add(rafal);
+			parkingLotFast = new Button("FASTER");
+			parkingLotSlow = new Button("SLOWER");
+			GridPane.setConstraints(parkingLotFast, 2, 12);
+			GridPane.setConstraints(parkingLotSlow, 3, 12);
+			parkingLotFast.setOnAction(this);
+			parkingLotSlow.setOnAction(this);
 			
-			//setting up to move rafal to parking lot
-			/*
-			 * 
-			 
-			TranslateTransition translate = new TranslateTransition();
-			translate.setDuration(Duration.millis(1000));
-			translate.setCycleCount(Animation.INDEFINITE);
+			grid.getChildren().addAll(rafal, parkingLotFast, parkingLotSlow);
+			
+			//setting up to move rafal to parking lot 
+			//bounds for x: 50 < x < 248
+			//bounds for y: 502 < y < 42
+			
+			translate = new PathTransition();
+			translate.setDuration(Duration.seconds(45));
+			translate.setCycleCount(PathTransition.INDEFINITE);
 			translate.setNode(rafal);
-			*/
-			Translate translate = new Translate();
 			
-			
-			int x = 1;
-			int y = 1;
-			
+			Path path = new Path();
+			path.getElements().add(new MoveTo (50, 50));
+			translate.setPath(path);
+
 			boolean hitRight = false;
 			boolean hitLeft = true;
 			boolean hitTop = true;
-			boolean hitBottom = false; 
+			boolean hitBottom = false;
 			
+			int x = 50;
+			int y = 50;
 			
-			if (translate.getX() <= 300 && hitRight) {
-				translate.setX(++x);
-				hitLeft = true;
+			for (int i = 0; i < 5000; ++i) {
+				if (hitLeft) {
+					path.getElements().add(new LineTo(++x, y));
+					if (x >= 248) {
+						hitLeft = false;
+						hitRight = true;
+					}
+				}
+				if (hitRight) {
+					path.getElements().add(new LineTo(--x, y));
+					if (x <= 50) {
+						hitLeft = true;
+						hitRight = false;
+					}
+				}
+				if (hitTop) {
+					path.getElements().add(new LineTo(x, ++y));
+					if (y >= 502) {
+						hitTop = false;
+						hitBottom = true;
+					}
+				}
+				if (hitBottom) {
+					path.getElements().add(new LineTo(x, --y));
+					if (y <= 42) {
+						hitTop = true;
+						hitBottom = false;
+					}
+				}
 			}
-			if (translate.getX() >= 550 && hitLeft) {
-				translate.setX(--x);
-				hitRight = true;
-			}
-			if (translate.getY() >= 600 && hitBottom) {
-				translate.setY(--y);
-				hitTop = true;
-			}
-			if (translate.getY() <= 0 && hitTop) {
-				translate.setY(++y);
-				hitBottom = true;
-			}
-			
-			rafal.getTransforms().addAll(translate);
-			
-			
-		
-			
-			
-			
-			
-			
-			
-			
-			
+			translate.play();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
