@@ -1,6 +1,12 @@
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
+import javafx.animation.Animation;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -17,16 +23,22 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class HDApplication extends Application implements EventHandler<ActionEvent>{
 	
 	private HammingDist hammDist;
 	
+	//all of the javafx components
+	private GridPane grid;
 	private Label hammDistLabel;
 	private TextField hammDistText;
 	private Button showStation;
@@ -34,6 +46,7 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 	private ListView<String> list;
 	private Label compareWith;
 	private ChoiceBox<String> choiceBox;
+	private ArrayList<String> stations;
 	private Button calcHD;
 	private Label distance0;
 	private TextField distance0Text;
@@ -53,6 +66,11 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		launch(args);
 	}
 
+	
+	/*
+	 * this method is where all of the components are initialized and added to the stage.
+	 * the method gets called from main after launch(args);
+	 */
 	@Override
 	public void start(javafx.stage.Stage primaryStage) throws Exception {
 		//Creating a HammingDist object to use the classes' methods
@@ -61,7 +79,7 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		primaryStage.setTitle("Hamming Distance");
 		
 		//creating the layout for the stage
-		GridPane grid = new GridPane();
+		grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(10, 10, 10, 10));
@@ -106,7 +124,7 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		//choiceBox 
 		choiceBox = new ChoiceBox<>();
 		GridPane.setConstraints(choiceBox, 1, 5);
-		ArrayList<String> stations = hammDist.getStations();
+		stations = hammDist.getStations();
 		choiceBox.getItems().addAll(stations);
 		choiceBox.setValue("ACME");
 		
@@ -175,16 +193,22 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		stationText.setPrefWidth(25);
 		GridPane.setConstraints(stationText, 1, 12);
 		
+		
 		//adding everything to the grid
 		grid.getChildren().addAll(hammDistLabel, hammDistText, slider, showStation
 				, list, compareWith, choiceBox, calcHD, distance0, distance0Text, distance1, 
 				distance1Text, distance2, distance2Text, distance3, distance3Text, distance4
 				, distance4Text, addStation, stationText);
 		
+		//this method handles all of the creative portions of the application
+		creativePortion();
+		
 		//creating the scene
 		Scene scene = new Scene(grid, 550, 600);
 		primaryStage.setScene(scene);
 		primaryStage.show();
+		
+		
 		
 		//stops running the application after exiting the application itself
 		primaryStage.setOnCloseRequest(new EventHandler<javafx.stage.WindowEvent>() {
@@ -220,16 +244,35 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		}
 		else if (event.getSource() == addStation) {
 			String station = stationText.textProperty().getValue().toUpperCase();
+			ArrayList<String> mesoStations = hammDist.getStations();
+			boolean duplicate = false;
 			
+			for (int i = 0; i < mesoStations.size(); ++i) {
+				String stationTest = mesoStations.get(i);
+				if (stationTest.equalsIgnoreCase(station)) {
+					duplicate = true;
+				}
+			}
 			//if user doesn't enter a valid input, an error message displays
 			if (station.length() != 4) {
 				Alert error = new Alert(AlertType.ERROR);
 				error.setHeaderText("Input not valid");
 				error.setContentText("The size of a station must be 4 characters!");
 				error.showAndWait();
+			} 
+			else if (duplicate) {
+				Alert error = new Alert(AlertType.ERROR);
+				error.setHeaderText("Duplicate station");
+				error.setContentText("The station you entered already exists!");
+				error.showAndWait();
 			}
 			else {
-				choiceBox.getItems().add(station);
+				//sorting then adding
+				stations.add(station);
+				Collections.sort(stations);
+				choiceBox.getItems().clear();
+				choiceBox.getItems().addAll(stations);
+				choiceBox.setValue("ACME");
 				stationText.clear();
 			}
 		}
@@ -246,6 +289,75 @@ public class HDApplication extends Application implements EventHandler<ActionEve
 		slider.setMinorTickCount(0);
 		slider.setSnapToTicks(true);
 		GridPane.setConstraints(slider, 0, 1);
+	}
+	
+	public void creativePortion() {
+		try {
+			//creating rafal image for screensaver
+			Image image = new Image(new FileInputStream("Resources/rafal.png"));
+			ImageView rafal = new ImageView(image);
+			
+			//setting size of the picture
+			GridPane.setConstraints(rafal, 3, 0);
+			rafal.setFitHeight(100);
+			rafal.setFitWidth(100);
+			rafal.setPreserveRatio(true);
+			
+			grid.getChildren().add(rafal);
+			
+			//setting up to move rafal to parking lot
+			/*
+			 * 
+			 
+			TranslateTransition translate = new TranslateTransition();
+			translate.setDuration(Duration.millis(1000));
+			translate.setCycleCount(Animation.INDEFINITE);
+			translate.setNode(rafal);
+			*/
+			Translate translate = new Translate();
+			
+			
+			int x = 1;
+			int y = 1;
+			
+			boolean hitRight = false;
+			boolean hitLeft = true;
+			boolean hitTop = true;
+			boolean hitBottom = false; 
+			
+			
+			if (translate.getX() <= 300 && hitRight) {
+				translate.setX(++x);
+				hitLeft = true;
+			}
+			if (translate.getX() >= 550 && hitLeft) {
+				translate.setX(--x);
+				hitRight = true;
+			}
+			if (translate.getY() >= 600 && hitBottom) {
+				translate.setY(--y);
+				hitTop = true;
+			}
+			if (translate.getY() <= 0 && hitTop) {
+				translate.setY(++y);
+				hitBottom = true;
+			}
+			
+			rafal.getTransforms().addAll(translate);
+			
+			
+		
+			
+			
+			
+			
+			
+			
+			
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
